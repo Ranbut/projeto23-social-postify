@@ -1,49 +1,26 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto } from './dto/addUser.dto';
-import { validate } from 'class-validator';
+import { CreateUserDTO } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
+import { UsersRepository } from './repository/user.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  async add(userData: CreateUserDto) {
-    const user = new CreateUserDto();
-    user.name = userData.name;
-    user.email = userData.email;
-    user.password = userData.password;
-    user.avatar = userData.avatar;
-
-    const errors = await validate(user);
-    if (errors.length > 0) {
-      throw new HttpException(
-        { message: 'Validation failed', errors },
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    const emailExists = await this.emailExists(user.email);
-    if (emailExists) {
-      throw new HttpException(
-        'Email already in use by another user',
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    return this.prisma.client.user.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        avatar: user.avatar,
-      },
+  async addUser(data: CreateUserDTO) {
+    const hashPassword = bcrypt.hashSync(data.password, 10);
+    const user = await this.usersRepository.findUserByEmail(data.email);
+    if (user)
+      throw new HttpException('User already exists', HttpStatus.CONFLICT);
+    return await this.usersRepository.addUser({
+      ...data,
+      password: hashPassword,
     });
   }
 
-  private async emailExists(email: string): Promise<boolean> {
-    const existingUser = await this.prisma.client.user.findUnique({
-      where: { email },
-    });
-    return !!existingUser;
+  async findUserById(id: number) {
+    const user = await this.usersRepository.findUserById(id);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user;
   }
 }
