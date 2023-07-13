@@ -19,7 +19,7 @@ export class PrismaPublicationsRepository implements PublicationsRepository {
     return await this.prisma.publication.findFirst({ where: { id: publicationId ,userId } });
   }
 
-  async updatePublication(data: Prisma.PublicationUncheckedCreateInput, publicationId: number) {
+  async updatePublication(data: Prisma.PublicationUpdateInput, publicationId: number) {
     return await this.prisma.publication.update({ 
       where: { id: publicationId },
       data
