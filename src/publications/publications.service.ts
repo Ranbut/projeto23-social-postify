@@ -10,12 +10,8 @@ export class PublicationsService {
     async postPublication(publicationDTO: CreatePublicationDTO, userId: number) {
       const publication = await this.publicationsRepository.postPublication({
         userId,
-        image: publicationDTO.image,
-        title: publicationDTO.title,
-        text: publicationDTO.text,
-        dateToPublish: new Date(publicationDTO.dateToPublish),
-        published: publicationDTO.published,
-        socialMedia: publicationDTO.socialMedia,
+        ...publicationDTO,
+        dateToPublish: new Date(publicationDTO.dateToPublish)
         }
         );
       return publication;
@@ -29,12 +25,8 @@ export class PublicationsService {
       await this.getUserPostExist(userId, publicationId);
 
       return await this.publicationsRepository.updatePublication({
-        userId,
-        image: publicationDTO.image,
-        title: publicationDTO.title,
-        text: publicationDTO.text,
-        dateToPublish: new Date(publicationDTO.dateToPublish),
-        socialMedia: publicationDTO.socialMedia,
+        ...publicationDTO,
+        dateToPublish: new Date(publicationDTO.dateToPublish)
         }, publicationId);
     }
 
