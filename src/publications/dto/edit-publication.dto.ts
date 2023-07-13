@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsString, Length, IsUrl, IsBoolean, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, Length, IsUrl, IsDateString } from 'class-validator';
 
-export class CreatePublicationDTO {
+export class EditPublicationDTO {
   @IsNotEmpty()
   @IsUrl()
   image: string
@@ -16,9 +16,6 @@ export class CreatePublicationDTO {
 
   @IsDateString()
   dateToPublish: string;
-
-  @IsBoolean()
-  published: boolean
 
   @IsNotEmpty()
   @IsString()

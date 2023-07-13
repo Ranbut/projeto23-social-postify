@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Request, UseGuards } from '@nestjs/common';
 import { PublicationsService } from './publications.service';
 import { AuthGuard } from '../auth/authGuard/auth.guard';
 import { CreatePublicationDTO } from './dto/create-publication.dto';
+import { EditPublicationDTO } from './dto/edit-publication.dto';
 
 @Controller('publications')
 export class PublicationsController {
@@ -19,4 +20,19 @@ export class PublicationsController {
     return this.publicationsService.getUserPublications(Number(req.user.id));
   }
 
+  @UseGuards(AuthGuard)
+  @Put(':id')
+  async getUserPuupdatePublicationblications(
+    @Body() body: EditPublicationDTO, 
+    @Request() req: any, 
+    @Param() params: any
+    ) {
+    return this.publicationsService.updatePublication(body, Number(req.user.id), Number(params.id));
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  async deletePublication(@Request() req: any, @Param() params: any) {
+    return this.publicationsService.deletePublication(Number(req.user.id), Number(params.id));
+  }
 }
