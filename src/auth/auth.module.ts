@@ -1,25 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersRepository } from 'src/users/repository/user.repository';
-import { PrismaUsersRepository } from 'src/users/repository/implementations/prismaUsers.repository';
-import { UsersService } from 'src/users/users.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { UsersModule } from 'src/users/users.module';
 
+@Global()
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-    }),
-  ],
+  imports: [JwtModule.register({
+    secret: process.env.JWT_SECRET
+  }), PrismaModule, UsersModule],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    UsersService,
-    {
-      provide: UsersRepository,
-      useClass: PrismaUsersRepository,
-    },
-  ],
+  providers: [AuthService],
+  exports: [AuthService]
 })
 export class AuthModule {}

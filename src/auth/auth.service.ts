@@ -14,18 +14,13 @@ import { User } from '@prisma/client';
 @Injectable()
 export class AuthService {
   private AUDIENCE = 'users';
-  private ISSUER = 'Driven';
+  private ISSUER = 'Postify';
 
   constructor(
     private readonly usersService: UsersService,
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
   ) {}
-
-  async signup(body: AuthSignupDTO) {
-    const user = await this.usersService.addUser(body);
-    return this.createToken(user);
-  }
 
   async signin({ email, password }: AuthSigninDTO) {
     const user = await this.usersRepository.findUserByEmail(email);
@@ -35,10 +30,10 @@ export class AuthService {
     if (!validPassword)
       throw new UnauthorizedException('Email or password invalid');
 
-    return this.createToken(user);
+    return this.createSession(user);
   }
 
-  createToken(user: User) {
+  async createSession(user: User) {
     const token = this.jwtService.sign(
       {
         name: user.name,
